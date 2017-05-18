@@ -1,0 +1,34 @@
+# -*- mode: nginx; mode: flyspell-prog;  ispell-local-dictionary: "american" -*-
+
+### Upstream configuration for PHP FastCGI.
+
+## Add as many servers as needed:
+## Cf. http://wiki.nginx.org/HttpUpstreamModule.
+## Note that this configuration assumes by default that keepalive
+## upstream connections are supported and that you have a Nginx
+## version with the fair load balancer.
+
+## Add as many servers as needed. Cf. http://wiki.nginx.org/HttpUpstreamModule.
+upstream phpcgi {
+    ## If your version of Nginx doesn't have the fair load balancer:
+    ## https://github.com/gnosek/nginx-upstream-fair comment out the
+    ## following line.
+    fair;
+    server 127.0.0.1:9001;
+    server 127.0.0.1:9002;
+    ## Create a backend connection cache. Note that this requires
+    ## Nginx version greater or equal to 1.1.4.
+    ## Cf. http://nginx.org/en/CHANGES. Comment out the following
+    ## line if that's not the case.
+    keepalive 5;
+}
+
+## Add a third pool as a fallback.
+#upstream phpcgi_backup {
+#    server 127.0.0.1:9003;
+#    ## Create a backend connection cache. Note that this requires
+#    ## Nginx version greater or equal to 1.1.4.
+#    ## Cf. http://nginx.org/en/CHANGES. Comment out the
+#    ## following line if that's not the case.
+#    keepalive 1;
+#}
