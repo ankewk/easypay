@@ -2,6 +2,7 @@
     "name": "ankewk/easypay",
     "description": "a easy of chinese payment php sdk",
     "license": "MIT",
+    "version": "1.0.0",
     "authors": [
         {
             "name": "ankewk",
