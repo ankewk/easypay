@@ -1,0 +1,62 @@
+version: '3.8'
+
+services:
+  php-fpm:
+    build: .
+    container_name: easypay_php
+    restart: unless-stopped
+    volumes:
+      - .:/var/www/html
+      - ./queue:/var/www/html/queue
+      - ./logs:/var/www/html/logs
+    environment:
+      - PHP_MEMORY_LIMIT=512M
+      - PHP_MAX_EXECUTION_TIME=300
+    depends_on:
+      - mysql
+      - redis
+    command: |
+      sh -c "
+        mkdir -p /var/www/html/queue /var/www/html/logs/async_queue
+        chmod -R 755 /var/www/html/queue /var/www/html/logs
+        php-fpm
+      "
+
+  nginx:
+    image: nginx:alpine
+    container_name: easypay_nginx
+    restart: unless-stopped
+    ports:
+      - "8000:80"
+    volumes:
+      - .:/var/www/html
+      - ./nginx/conf.d:/etc/nginx/conf.d
+    depends_on:
+      - php-fpm
+
+  mysql:
+    image: mysql:5.7
+    container_name: easypay_mysql
+    restart: unless-stopped
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_DATABASE: easypay
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_USER: easypay
+      MYSQL_PASSWORD: easypay
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  redis:
+    image: redis:alpine
+    container_name: easypay_redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+
+volumes:
+  mysql_data:
+  redis_data:
